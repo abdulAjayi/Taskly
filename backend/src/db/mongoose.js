@@ -6,6 +6,5 @@ async function connectMongoose() {
     console.log(`error from connection to database:`, error.message);
   }
 }
-connectMongoose();
-
-module.exports = connectMongoose;
+connectMongoose()
+// module.exports = connectMongoose;

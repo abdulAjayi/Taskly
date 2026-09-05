@@ -41,8 +41,8 @@ const userSchema = mongoose.Schema(
     tokens: [
       {
         token: {
-          type: String,
-          required: true,
+          type: "String",
+          required: "true",
         },
       },
     ],
@@ -72,15 +72,13 @@ userSchema.methods.getAuthToken = async function () {
 userSchema.methods.toJSON = function () {
   const user = this;
   const userObject = user.toObject();
-  // delete userObject.password;
+  delete userObject.password;
   delete userObject.tokens;
-
   return userObject;
 };
 
 userSchema.statics.findByCredentials = async (email, password) => {
   const user = await model.findOne({ email });
-  console.log(user);
   if (!user) {
     throw new Error("unable to login");
   }
@@ -94,7 +92,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
 userSchema.pre("save", async function () {
   const user = this;
   if (user.isModified("password")) {
-    user.password = await bcrypt.hash(user.password, 8);
+    user.password = await bcrypt.hash(user.password, 4);
   }
 });
 

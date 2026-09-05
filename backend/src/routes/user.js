@@ -15,15 +15,14 @@ router.post("/users/sign", async (req, res) => {
     res.status(400).send({ error: error.message });
   }
 });
-router.get("/users/me", Auth, async (req, res) => {
-  res.send(req.user);
-});
+// router.get("/users/me", Auth, async (req, res) => {
+//   res.send(req.user);
+// });
 
 router.get("/users", async (req, res) => {
   try {
     const user = await User.find({});
     res.send(user);
-    // console.log(user);
   } catch (error) {
     console.log(error.message);
   }
@@ -51,7 +50,7 @@ router.patch("/users/me", Auth, async (req, res) => {
     const user = req.user;
     updates.forEach((update) => (user[update] = req.body[update]));
     await user.save();
-    res.send(user);
+    res.status(200).send(user);
   } catch (error) {
     res.status(400).send({ error: "pls check your password" });
     console.log(error.message);
@@ -67,7 +66,7 @@ router.post("/users/login", async (req, res) => {
     const token = await user.getAuthToken();
     res.status(200).send({ user, token });
   } catch (error) {
-    res.status(400).send(error.message);
+    res.status(404).send(error.message);
   }
 });
 
@@ -98,11 +97,11 @@ router.post("/users/logout/others", Auth, async (req, res) => {
 router.delete("/users/me", Auth, async (req, res) => {
   try {
     await req.user.deleteOne();
-    res.send(req.user);
+    res.status(200).send(req.user);
   } catch (error) {
     res.status(500).send(error.message);
   }
-}); 
+});
 
 const upload = multer({
   limits: {
@@ -135,10 +134,8 @@ router.delete("/users/me/upload", Auth, async (req, res) => {
   await req.user.save();
   res.send(req.user);
 });
-module.exports = router;
 router.get("/users/:id/avatar", async (req, res) => {
   const user = await User.findById(req.params.id);
-  console.log(user);
   if (!user | !user.avatar) {
     throw new Error({ error: "profile picture not found" });
   }
@@ -168,7 +165,6 @@ router.post(
     await req.user.save();
     res.set("content-type", "png");
     res.send(req.user.avatar);
-    console.log(req.user);
   },
   (error, req, res, next) => {
     res.send({ error: error.message });

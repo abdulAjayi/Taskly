@@ -2,7 +2,6 @@ const Task = require("../model/task");
 const express = require("express");
 const router = express.Router();
 const Auth = require("../middleware/auth");
-
 router.post("/tasks", Auth, async (req, res) => {
   try {
     const task = await Task.create({
@@ -14,15 +13,14 @@ router.post("/tasks", Auth, async (req, res) => {
     res.status(400).send({ error: error.message });
   }
 });
-
 router.get("/tasks/all", Auth, async (req, res) => {
   const match = {};
   const sort = {};
   if (req.query.completed) {
     match.completed = req.query.completed === "true";
   }
-  const update = req.query.sortBy.split("_");
   if (req.query.sortBy) {
+    const update = req.query.sortBy.split("_");
     sort[update[0]] = update[1] === "desc" ? -1 : 1;
   }
   try {
@@ -43,7 +41,6 @@ router.get("/tasks/all", Auth, async (req, res) => {
     res.status(500).send(error.message);
   }
 });
-
 router.patch("/tasks/:id", Auth, async (req, res) => {
   try {
     const updates = Object.keys(req.body);
@@ -58,8 +55,6 @@ router.patch("/tasks/:id", Auth, async (req, res) => {
     const correctData = updates.every((item) => {
       return allowedData.includes(item);
     });
-    console.log(correctData);
-
     if (!correctData) {
       return res
         .status(400)
@@ -67,18 +62,16 @@ router.patch("/tasks/:id", Auth, async (req, res) => {
     }
     const _id = req.params.id;
     const task = await Task.findOne({ _id, owner: req.user._id });
-    console.log(task);
-    updates.forEach((update) => (task[update] = req.body[update]));
-    await task.save();
     if (!task) {
       return res.status(404).send({ error: "user not found" });
     }
+    updates.forEach((update) => (task[update] = req.body[update]));
+    await task.save();
     res.status(200).send(task);
   } catch (error) {
     res.status(400).send({ error: "user not found" });
   }
 });
-
 router.get("/tasks/:id", Auth, async (req, res) => {
   try {
     const _id = req.params.id;
@@ -91,12 +84,10 @@ router.get("/tasks/:id", Auth, async (req, res) => {
     res.status(500).send();
   }
 });
-
 router.delete("/tasks/:id", Auth, async (req, res) => {
   try {
     const _id = req.params.id;
     const tasks = await Task.findOneAndDelete({ _id, owner: req.user._id });
-    console.log(tasks);
     if (!tasks) {
       return res.status(404).send();
     }
@@ -105,5 +96,4 @@ router.delete("/tasks/:id", Auth, async (req, res) => {
     res.status(500).send(error.message);
   }
 });
-
 module.exports = router;
