@@ -12,7 +12,7 @@ export default function Layout() {
     <main className="app">
       <header>
         <NavLink to="/tasks" className="brand">
-          <b>□</b> TASKS
+          <b>□</b> TASKLY
         </NavLink>
         <nav>
           <NavLink to="/tasks">Tasks</NavLink>

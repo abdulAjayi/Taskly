@@ -44,7 +44,7 @@ export default function AuthPage({ signup = false }) {
       </section>
       <section className="auth-form">
         <Link className="brand" to="/login">
-          <b>□</b> TASKS
+          <b>□</b> TASKLY
         </Link>
         <div>
           <p className="kicker">{signup ? "NEW ACCOUNT" : "WELCOME BACK"}</p>
@@ -92,7 +92,7 @@ export default function AuthPage({ signup = false }) {
             </button>
           </form>
           <p className="switch">
-            {signup ? "Already registered?" : "New to Tasks?"}{" "}
+            {signup ? "Already registered?" : "New to Taskly?"}{" "}
             <Link to={signup ? "/login" : "/signup"}>
               {signup ? "Sign in" : "Create account"}
             </Link>
