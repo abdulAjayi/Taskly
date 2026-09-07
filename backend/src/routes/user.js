@@ -108,8 +108,8 @@ const upload = multer({
     fileSize: 900000,
   },
   fileFilter(req, file, cb) {
-    if (!file.originalname.match(/\.(docx|xlsx)$/)) {
-      cb(new Error("pls upload a word document or an excel document"));
+    if (!file.mimetype.startsWith("image/")) {
+      return cb(new Error("pls upload an image file"));
     }
     cb(undefined, true);
   },
@@ -120,7 +120,10 @@ router.post(
   Auth,
   upload.single("upload"),
   async (req, res) => {
-    req.user.avatar = req.file.buffer;
+    req.user.avatar = await sharp(req.file.buffer)
+      .resize({ width: 200, height: 200, fit: "cover" })
+      .png()
+      .toBuffer();
     await req.user.save();
     res.send(req.user);
   },
@@ -136,13 +139,10 @@ router.delete("/users/me/upload", Auth, async (req, res) => {
 });
 router.get("/users/:id/avatar", async (req, res) => {
   const user = await User.findById(req.params.id);
-  if (!user | !user.avatar) {
-    throw new Error({ error: "profile picture not found" });
+  if (!user || !user.avatar) {
+    return res.status(404).send({ error: "profile picture not found" });
   }
-  res.set(
-    "content-type",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  );
+  res.set("content-type", "image/png");
   res.send(user.avatar);
 });
 
